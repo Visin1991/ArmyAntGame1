@@ -10,6 +10,10 @@ public class Player : LivingEntity {
 	PlayerController controller;
 	GunController gunController;
 	int gunIndex;
+    public KeyCode shootKey;
+    public KeyCode jumpKey;
+    public KeyCode switchKey;
+    public KeyCode reloadKey;
 
 	// Use this for initialization
 	public override void Start () {
@@ -25,9 +29,40 @@ public class Player : LivingEntity {
 	void Update () {
 
 		controller.GenericMotion();
-		//controller.GenericMotion_FixedFacing();
 
-		if(CrossPlatformInputManager.GetButton("Boost"))
+        StandardInput();
+    }
+
+	void FixedUpdate()
+	{
+		controller.UpdateRigidBodyController();
+	}
+
+    void StandardInput()
+    {
+        if (Input.GetKey(shootKey))
+        {
+            gunController.OnTriggerHold();
+        }
+        if (Input.GetKeyUp(shootKey))
+        {
+            gunController.OntriggerRelease();
+        }
+        if (Input.GetKeyDown(switchKey))
+        {
+            Debug.Log("ChangeWepoon");
+            gunController.EquipGunIndex(gunIndex % 3);
+            gunIndex++;
+        }
+        if (Input.GetKeyDown(reloadKey))
+        {
+            gunController.Reload();
+        }
+    }
+
+    void CrossPlatFormImput()
+    {       
+		if(CrossPlatformInputManager.GetButtonDown("Boost"))
 		{
 			gunController.OnTriggerHold();
 		}
@@ -39,24 +74,11 @@ public class Player : LivingEntity {
 		{
 			gunController.Reload();
 		}
-
 		if(CrossPlatformInputManager.GetButtonDown("SwitchWepon"))
 		{
             Debug.Log("ChangeWepoon");
 			gunController.EquipGunIndex(gunIndex%3);
 			gunIndex++;
 		}
-
-		if(Input.GetKeyDown(KeyCode.K))
-		{
-			TakeDamage(10.0f);
-		}
-			
-	}
-
-	void FixedUpdate()
-	{
-		controller.UpdateRigidBodyController();
-	}
-		
+    }
 }

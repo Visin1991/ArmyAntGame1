@@ -30,21 +30,28 @@ public class ThirdPersonCamera : MonoBehaviour {
     }
 
     void LateUpdate () {
-        //yaw += Input.GetAxis("Mouse X") * mouseSensitivity;
-        //pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-        //yaw += TouchLib.GetSwipeHorizontal() * mouseSensitivity;
-        //pitch -= TouchLib.GetSwipeVertical() * mouseSensitivity;
-        Vector2 yawPitch = TouchLib.GetSwipe2D() * mouseSensitivity;
-        yaw += yawPitch.x;
-        pitch -= yawPitch.y;
 
-		pitch = Mathf.Clamp (pitch, pitchMinMax.x, pitchMinMax.y);
+        StandardMouseControll();
+
+        pitch = Mathf.Clamp (pitch, pitchMinMax.x, pitchMinMax.y);
 
 		currentRotation = Vector3.SmoothDamp (currentRotation, new Vector3 (pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
 		transform.eulerAngles = currentRotation;
 
 		transform.position = target.position - transform.forward * dstFromTarget;
-
 	}
+
+    void StandardMouseControll()
+    {
+        yaw += Input.GetAxis("Mouse X") * mouseSensitivity;
+        pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+    }
+
+    void CrossPlatFormInput()
+    {
+        Vector2 yawPitch = TouchLib.GetSwipe2D() * mouseSensitivity;
+        yaw += yawPitch.x;
+        pitch -= yawPitch.y;
+    }
 
 }

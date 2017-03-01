@@ -89,11 +89,11 @@ namespace Test1_2
 
         void UpdateAnimationSmooth_IK() //call this method from PlayerController1_2_2.
         {
-            if (Input.GetKeyDown(KeyCode.B))
+            /*if (Input.GetKeyDown(KeyCode.B))
             {
                 SetClosetIKObject();
                 StartPickIKTarget();    
-            }
+            }*/
         }
 
         void StartPickIKTarget()
