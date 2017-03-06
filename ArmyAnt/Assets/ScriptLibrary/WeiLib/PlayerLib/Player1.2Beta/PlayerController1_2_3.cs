@@ -59,6 +59,7 @@ namespace Test1_2
         {
             //fieldOfView.DebugDrawFielOfView();
             GetAllIKObjectInRange();
+
             if (inCheckRangeIKObjs.Count > 0)
             {
                 UpdateinRangeIkObjs();
@@ -69,7 +70,6 @@ namespace Test1_2
         {
             if (leftHandIK)
             {
-                leftHandIKTargetTF.position = currentIKTarget.Bounds.ClosestPoint(LeftHandBoneTF.position);  
                 animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, lefthandPositionWeight);
                 animator.SetIKPosition(AvatarIKGoal.LeftHand, leftHandIKTargetTF.position);
                 animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, leftHandRotationWeight);
@@ -77,7 +77,6 @@ namespace Test1_2
             }
             if (rightHandIK)
             {
-                rightHandIKTargetTK.position = currentIKTarget.Bounds.ClosestPoint(RightHandBoneTF.position);
                 animator.SetIKPositionWeight(AvatarIKGoal.RightHand, rightHandPositionWeight);
                 animator.SetIKPosition(AvatarIKGoal.RightHand, rightHandIKTargetTK.position);
                 animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rightHandRotationWeigt);
@@ -89,13 +88,32 @@ namespace Test1_2
 
         void UpdateAnimationSmooth_IK() //call this method from PlayerController1_2_2.
         {
-            /*if (Input.GetKeyDown(KeyCode.B))
+            if (Input.GetKeyDown(KeyCode.B))
             {
-                SetClosetIKObject();
+                GetClosetIKObject();
                 StartPickIKTarget();    
-            }*/
+            }
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                animator.SetBool("Special", true);
+                animator.SetInteger("specialType", 2);
+                Invoke("Throw", 0.5f);
+            }
         }
 
+        void Throw()
+        {
+            currentIKTarget.gameObject.AddComponent<Rigidbody>().AddForce(transform.forward * 1000);
+            currentIKTarget.updateDel -= currentIKTarget.FollowTarget;
+            currentIKTarget = null;
+            leftHandIK = false;
+            rightHandIK = false;
+        }
+
+        /// <summary>
+        ///     When we start PickIKTarget. We use naveMeshAngent to auto move to the IKTarget
+        /// and also add the all necessary animation to the Update delegate.
+        /// </summary>
         void StartPickIKTarget()
         {
             if(currentIKTarget == null) { return; }
@@ -106,6 +124,10 @@ namespace Test1_2
             updateDel += OnMoveToTarget;
         }
 
+        /// <summary>
+        ///     Add this function the update delegate. As the player auto move the a target. we auto set the move animation.
+        /// when we get close enough to the IK Object. we auto player the pick object animation.
+        /// </summary>
         void OnMoveToTarget()
         {
             animator.SetFloat("speedPercent", 0.5f);
@@ -117,28 +139,17 @@ namespace Test1_2
             }
         }
 
-        public void GetPickUpBuilding()
-        {
-            
-            leftHandIKTargetTF.SetParent(currentIKTarget.transform);
-            rightHandIKTargetTK.SetParent(currentIKTarget.transform);
-            currentIKTarget.SetAnimatorTargetTF(transform);
-
-            currentIKTarget.followAnimatorTransform -= currentIKTarget.FollowTarget;
-            currentIKTarget.followAnimatorTransform += currentIKTarget.FollowTarget;
-
-            leftHandIK = true;
-            rightHandIK = true;
-        }
-
-        void SetClosetIKObject()
+        /// <summary>
+        ///     When there are several IKObject in field of View. We only get the cloest IKObject
+        /// </summary>
+        void GetClosetIKObject()
         {
             if (inCheckRangeIKObjs.Count <= 0) { return; }
             float minDist = float.MaxValue;
             IKObject closetIkObj = inCheckRangeIKObjs[0];
             foreach (IKObject i in inCheckRangeIKObjs)
             {
-                i.closetPointToPlayer = i.bounds.ClosestPoint(transform.position);
+                i.closetPointToPlayer = i.Bounds.ClosestPoint(transform.position);
                 float dst = (transform.position - i.closetPointToPlayer).magnitude;
                 if(dst < minDist) { minDist = dst; closetIkObj = i; i.dstToPlayer = dst; }
             }
@@ -208,6 +219,26 @@ namespace Test1_2
             }
         }
         #endregion
+
+        #region AnimationCallBack
+        /// <summary>
+        ///     this is a call back function. 
+        /// We call it when the pickUp animation exit 
+        /// </summary>
+        public void GetPickUpBuilding()
+        {
+            currentIKTarget.SetAnimatorTargetTF(transform);
+            leftHandIKTargetTF.SetParent(currentIKTarget.transform);
+            rightHandIKTargetTK.SetParent(currentIKTarget.transform);
+
+            currentIKTarget.updateDel -= currentIKTarget.FollowTarget;
+            currentIKTarget.updateDel += currentIKTarget.FollowTarget;
+
+            leftHandIK = true;
+            rightHandIK = true;
+        }
+        #endregion
+
         public Vector3 originaPos;
         public Vector3 forwardEndPos;
         private void OnDrawGizmos()

@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/HumanoidTest.unity
-  isLoaded: 1
-  isActive: 1

@@ -108,7 +108,7 @@ public partial class WeiIKSnap : MonoBehaviour {
         nextTimeToCheckTouchableIKObj = Time.time + 0.1f;       
         for (int i = climbableIKObjs.Count - 1;i >=0;i--)
         {//iterate backwards by index, removing matching items
-            float sqrDstFromNearestEdge = climbableIKObjs[i].bounds.SqrDistance(transform.position);
+            float sqrDstFromNearestEdge = climbableIKObjs[i].Bounds.SqrDistance(transform.position);
             //Debug.Log(sqrDstFromNearestEdge);
             if (sqrRangeToGetCOI < sqrDstFromNearestEdge){ //For some reason, the Sqrt     
                 climbableIKObjs.RemoveAt(i);
@@ -128,7 +128,7 @@ public partial class WeiIKSnap : MonoBehaviour {
     {
         touchableIKObjs.Clear();
         foreach (IKObject c in climbableIKObjs){
-            if ((c.transform.position.y + c.bounds.size.y/2) > handReachableHeight+transform.position.y) {continue;}
+            if ((c.transform.position.y + c.Bounds.size.y/2) > handReachableHeight+transform.position.y) {continue;}
             touchableIKObjs.Add(c);
         }
 

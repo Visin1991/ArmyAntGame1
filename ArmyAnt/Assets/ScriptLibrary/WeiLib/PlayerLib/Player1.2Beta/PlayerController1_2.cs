@@ -338,6 +338,7 @@ namespace Test1_2
             Start2();
             Start3();
         }
+
         private void FixedUpdate()
         {
             FixedUpdate3();
